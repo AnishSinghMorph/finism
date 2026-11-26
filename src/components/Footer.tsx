@@ -8,9 +8,9 @@ export default function Footer() {
     <footer className="border-t border-white/10 bg-ink px-6 py-20 text-white">
       <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div>
-          <Logo reverse className="text-3xl" />
-          <p className="mt-6 max-w-xs font-sans text-xl text-white/80">
-            Made to build. Made to last<span id="dot-end" className={`ml-0.5 inline-block h-2.5 w-2.5 rounded-full ${rich ? '' : 'bg-purple'}`} />
+          <Logo reverse dock={rich} className="text-4xl" />
+          <p className="mt-6 font-sans text-xl text-white/80">
+            <span className="whitespace-nowrap">Made to build. Made to last<span className="text-purple">.</span></span>
           </p>
         </div>
         {nav.map((g) => (
