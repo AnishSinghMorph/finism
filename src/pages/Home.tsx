@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Reveal from '../components/Reveal'
+import { BentoField, InteractiveCard } from '../components/BentoField'
 import Hero from './home/Hero'
 import Questions from './home/Questions'
 
@@ -54,19 +55,19 @@ export default function Home() {
       <section className="px-6 py-28">
         <div className="mx-auto max-w-6xl">
           <Reveal><p className="eyebrow">Where are you on the journey?</p></Reveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <BentoField cols={3} className="mt-8 grid gap-4 md:grid-cols-3">
             {journey.map(([t, d, a, to], n) => (
               <Reveal key={t} delay={n * 0.1}>
-                <motion.div whileHover={{ y: -6 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }} className="group flex h-full flex-col rounded-3xl border border-hairline bg-white p-8 hover:border-purple/40 hover:shadow-[0_24px_50px_-28px_rgba(109,63,192,.5)]">
+                <InteractiveCard className="group flex flex-col border border-hairline bg-white p-8 hover:border-purple/40 hover:shadow-[0_24px_50px_-28px_rgba(109,63,192,.5)]">
                   <h3 className="text-[1.9rem] font-medium leading-tight">{t}</h3>
                   <p className="mt-3 flex-1 text-muted">{d}</p>
                   <Link to={to} className="mt-8 inline-flex items-center gap-2 text-[15px] font-medium text-purple">
                     {a} <span className="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden>→</span>
                   </Link>
-                </motion.div>
+                </InteractiveCard>
               </Reveal>
             ))}
-          </div>
+          </BentoField>
         </div>
       </section>
 
