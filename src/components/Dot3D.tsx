@@ -9,7 +9,7 @@ const bez = (a: number, b: number, c: number, d: number, t: number) => { const u
 const sizeAt = (t: number) => t < 0.25 ? 1 : t < 0.55 ? M.lerp(1, 0.65, (t - 0.25) / 0.3) : t < 0.8 ? M.lerp(0.65, 0.3, (t - 0.55) / 0.25) : M.lerp(0.3, 0.12, (t - 0.8) / 0.2)
 
 // Position of the main orb, shared with the single satellite (the satellite foreshadows the orb's final small size).
-const shared = { x: 0, y: 0, r: 0, hide: false, rn: 9, lane: { x: 0, y: 0 }, t: 0, arc: 1 }
+const shared = { x: 0, y: 0, r: 0, hero: false, hide: false, rn: 9, lane: { x: 0, y: 0 }, t: 0, arc: 1 }
 
 // One orb in a fixed full-screen canvas (1 world unit = 1 css px). One continuous journey, all driven by scroll:
 //   hero   : sits at #dot-hero, large                                   (t 0 - .25)
@@ -36,6 +36,7 @@ function Orb() {
 
     let x = lane.x, y = lane.y, r = 9
     shared.t = 0
+    shared.hero = !!document.getElementById('dot-hero') // the small moons belong to the home hero only
     const intro = smooth(clamp((time - 0.5) / 1.8)) // on arrival the orb rises into place, like a sun clearing the towers
     mats.forEach((mt) => { mt.envMapRotation.y = sy * 0.0022 + time * 0.05 }) // the reflected street slides past as it travels
 
@@ -144,7 +145,7 @@ function Satellite({ phase, speed, rad, moon, delay }: { phase: number; speed: n
     const { width: vw, height: vh } = size
     const time = clock.elapsedTime
     let x = shared.x, y = shared.y, r = 0, z = 0
-    if (!shared.hide && shared.t < 1 && shared.r > 1) {
+    if (shared.hero && !shared.hide && shared.t < 1 && shared.r > 1) {
       const a = time * speed + phase
       const R = shared.r * rad
       const ax = shared.x + Math.cos(a) * R, ay = shared.y + Math.sin(a) * R * 0.38 - Math.cos(a) * R * 0.12 // tilted ellipse

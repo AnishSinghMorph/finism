@@ -1,40 +1,30 @@
-import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'motion/react'
 import PageHero from '../components/PageHero'
 import CtaBand from '../components/CtaBand'
-import Reveal, { ease } from '../components/Reveal'
-import { usePinSteps } from '../components/usePinSteps'
+import Reveal from '../components/Reveal'
+import Blueprint from './services/Blueprint'
 import { matrix, stages } from '../content'
 
 export default function Services() {
-  const root = useRef<HTMLElement>(null)
-  const { i, bar } = usePinSteps(root, stages.length, 2.4)
-  const s = stages[i]
   return (
     <>
       <PageHero eyebrow="Solutions / Services" title={<>Finism across the whole <em>GCC lifecycle.</em></>} intro="Three stages, six capabilities. Each stage ends in an outcome you can measure." />
 
-      <section ref={root} className="bg-pale">
-        <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-6 py-24 md:grid-cols-[0.8fr_1.2fr]">
-          <ol className="space-y-3" aria-label="Stages">
-            {stages.map((st, n) => (
-              <li key={st.n} className={`flex items-center gap-4 font-sans text-2xl transition-all duration-300 ${n === i ? 'translate-x-2 text-deep' : 'text-deep/30'}`}>
-                <span className={`grid h-9 w-9 place-items-center rounded-full border text-sm transition-colors ${n === i ? 'border-purple bg-purple text-white' : 'border-hairline'}`}>{st.n}</span>
-                {st.title}
-              </li>
-            ))}
-            <div className="relative ml-4 mt-6 h-px w-40 bg-hairline"><div ref={bar} className="absolute inset-0 origin-left bg-purple" style={{ scale: '0 1' }} /></div>
-          </ol>
-          <AnimatePresence mode="wait">
-            <motion.div key={i} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.4, ease }} className="rounded-3xl bg-white p-8 md:p-12">
-              <p className="eyebrow">Stage {s.n}</p>
-              <h2 className="mt-3 text-4xl font-medium md:text-5xl">{s.title}</h2>
-              <p className="mt-5 text-lg text-muted">{s.body}</p>
-              <p className="mt-8 border-t border-hairline pt-6 text-lg text-deep"><span className="text-purple">Outcome:</span> {s.outcome}</p>
-              <Link to={s.to} className="mt-8 inline-block rounded-full bg-purple px-6 py-3.5 text-[15px] font-medium text-white">{s.cta} →</Link>
-            </motion.div>
-          </AnimatePresence>
+      <Blueprint />
+
+      <section className="bg-pale px-6 py-24">
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
+          {stages.map((st, n) => (
+            <Reveal key={st.n} delay={n * 0.1}>
+              <div className="flex h-full flex-col rounded-3xl bg-white p-8">
+                <p className="eyebrow">Stage {st.n}</p>
+                <h2 className="mt-3 text-3xl font-medium">{st.title}</h2>
+                <p className="mt-4 flex-1 text-muted">{st.body}</p>
+                <p className="mt-6 border-t border-hairline pt-5 text-deep"><span className="text-purple">Outcome:</span> {st.outcome}</p>
+                <Link to={st.to} className="mt-6 inline-flex w-fit rounded-full bg-purple px-5 py-3 text-[15px] font-medium text-white">{st.cta} →</Link>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 

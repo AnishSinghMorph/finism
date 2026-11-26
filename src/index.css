@@ -48,3 +48,16 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes pulse-soft { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
 .pulse { animation: pulse-soft 7s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+
+/* GCC Blueprint: hovering a module focuses its subsystem; the rest of the system recedes but stays visible. */
+.bp-mod { transition: opacity .5s ease, transform .6s cubic-bezier(.22, 1, .36, 1); }
+.bp[data-focus] .bp-mod { opacity: .5; transform: scale(.97); }
+.bp[data-focus] .bp-mod[data-on] { opacity: 1; transform: scale(1.1); }
+.bp [data-for] { transition: opacity .5s ease; }
+.bp[data-focus] [data-for] { opacity: .22; }
+.bp[data-focus=talent] [data-for~=talent], .bp[data-focus=workspace] [data-for~=workspace], .bp[data-focus=infrastructure] [data-for~=infrastructure],
+.bp[data-focus=operations] [data-for~=operations], .bp[data-focus=consulting] [data-for~=consulting], .bp[data-focus=governance] [data-for~=governance] { opacity: 1; }
+.bp-core { transition: box-shadow .6s ease; }
+.bp[data-focus] .bp-core { box-shadow: 0 0 0 1.1cqw rgb(109 63 192 / .35); }
+.bp-panel { opacity: 0; transform: translateY(.6cqw); pointer-events: none; transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1); }
+.bp-mod[data-on] + .bp-panel { opacity: 1; transform: none; }

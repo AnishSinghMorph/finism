@@ -18,6 +18,8 @@ export default function CostCapability() {
   const capO = useTransform(p, (v) => win(v, 0.22, 0.5))
   const isO = useTransform(p, (v) => win(v, 0.55, 0.7)), isX = useTransform(p, (v) => -24 * (1 - win(v, 0.55, 0.72)))
   const subO = useTransform(p, (v) => win(v, 0.7, 0.85))
+  // the stage blends in from the pale section above and back out to the pale section below, so there is no hard colour cut at either edge
+  const bg = useTransform(p, [0, 0.12, 0.8, 1], ['#F4F1FB', '#ffffff', '#ffffff', '#F4F1FB'])
 
   if (reduce) {
     return (
@@ -29,14 +31,14 @@ export default function CostCapability() {
   }
   return (
     <div ref={root} style={{ height: '260vh' }}>
-      <div className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden px-6 text-center">
+      <motion.div style={{ backgroundColor: bg }} className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden px-6 text-center">
         <motion.p style={{ opacity: clauseO }} className="absolute top-[22%] font-sans text-lg text-muted md:text-2xl">Cost is no longer the pitch.</motion.p>
         <motion.h2 style={{ scale: costS, y: costY, opacity: costO }} className="absolute font-sans text-[clamp(5rem,22vw,17rem)] font-medium uppercase leading-none tracking-tight text-deep">Cost</motion.h2>
         <motion.h2 style={{ scale: capS, y: capY, opacity: capO }} className="absolute font-sans text-[clamp(2.6rem,10.5vw,9rem)] font-medium leading-none tracking-tight text-deep">
           Capability <motion.em style={{ opacity: isO, x: isX }} className="inline-block text-purple">is.</motion.em>
         </motion.h2>
         <motion.p style={{ opacity: subO }} className="absolute bottom-[18%] max-w-md text-muted">Finism builds the capability behind the centre, and stays accountable for it.</motion.p>
-      </div>
+      </motion.div>
     </div>
   )
 }

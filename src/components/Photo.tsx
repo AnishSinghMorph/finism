@@ -5,6 +5,7 @@ export const photos = {
   towers: { id: '1486406146926-c627a92ad1ab', alt: 'Glass office towers seen from street level, converging toward the sky' },
   workspace: { id: '1497366216548-37526070297c', alt: 'A long, quiet office corridor with glass partitions and warm lighting' },
   servers: { id: '1558494949-ef010cbdcc31', alt: 'Server racks with dense network cabling and indicator lights' },
+  team: { id: '1551434678-e076c223a692', alt: 'Two engineers working side by side at laptops in a bright open office' },
   operations: { id: '1568992687947-868a62a9f521', alt: 'An open operations floor with rows of engineers at shared desks' },
 }
 const src = (id: string, w: number) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=68`
