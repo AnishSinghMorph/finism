@@ -6,8 +6,8 @@ import { rich } from './rich'
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-ink px-6 py-20 text-white">
-      <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-        <div>
+      <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1fr_1fr_1fr_1fr_1.4fr]">
+        <div className="md:order-last md:flex md:flex-col md:items-end md:text-right">
           <Logo reverse dock={rich} className="text-4xl" />
           <p className="mt-6 font-sans text-xl text-white/80">
             <span className="whitespace-nowrap">Made to build. Made to last<span className="text-purple">.</span></span>
