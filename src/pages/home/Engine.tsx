@@ -62,7 +62,7 @@ function Stage({ p }: { p: MotionValue<number> }) {
   const fill = useTransform(p, [0.85, 0.93], ['#6D3FC0', '#F4F1FB'])
 
   return (
-    <div className="relative mx-auto aspect-[16/10] w-[min(94vw,1100px)] [container-type:inline-size]">
+    <div id="engine-stage" className="relative mx-auto aspect-[16/10] w-[min(94vw,1100px)] [container-type:inline-size]">
       {/* connections between modules: they appear as the modules close in, and are replaced by the brain graph */}
       <svg aria-hidden viewBox="-50 -31.25 100 62.5" className="absolute inset-0 h-full w-full">
         <motion.g style={{ opacity: lineO }} stroke="#cdb8ff" strokeOpacity=".5" strokeWidth=".12">
@@ -159,7 +159,7 @@ export default function Engine() {
   }
 
   return (
-    <div ref={root} style={{ height: '520vh' }} data-no-dot>
+    <div ref={root} style={{ height: '520vh' }} data-engine>
       <div className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden bg-ink">
         <div aria-hidden className="absolute inset-0 opacity-60" style={{ backgroundImage: 'linear-gradient(rgb(255 255 255 / .04) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .04) 1px, transparent 1px)', backgroundSize: '56px 56px', maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)' }} />
         <motion.div style={{ opacity: captionO }} className="absolute left-[max(1.5rem,calc(50%-34rem))] top-28 z-30 h-40 w-[min(26rem,40vw)]">

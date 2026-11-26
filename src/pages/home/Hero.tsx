@@ -84,7 +84,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-deep/30 to-purple/25 mix-blend-multiply" />
             </motion.div>
           </motion.div></div>
-          <div id="dot-hero" className="absolute -left-[9%] top-[44%] aspect-square w-[42%]">
+          <div id="dot-hero" className="absolute left-[83%] top-[33%] aspect-square w-[42%]">
             {!rich && (
               <div
                 className="absolute inset-[22%] rounded-full shadow-[inset_-18px_-26px_50px_rgba(36,22,64,.45)]"
