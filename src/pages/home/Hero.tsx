@@ -13,7 +13,7 @@ const chips = [
   { text: 'Fragmented delivery', pos: 'left-0 top-[14%]', rot: -7, fly: [-90, -60] },
   { text: 'Unclear accountability', pos: 'right-0 top-[8%]', rot: 5, fly: [90, -80] },
   { text: 'Difficulty scaling', pos: 'left-[2%] bottom-[18%]', rot: 4, fly: [-110, 60] },
-  { text: 'Not delivering what was planned', pos: 'right-[-2%] bottom-[10%]', rot: -5, fly: [100, 70] },
+  { text: 'Not delivering what was planned', pos: 'right-0 bottom-[10%]', rot: -5, fly: [100, 70] },
 ]
 const stages = [
   ['01', 'Start', 'Define what matters.'],
@@ -64,10 +64,15 @@ export default function Hero() {
 
         <div className="relative mx-auto aspect-square w-full max-w-[520px]">
           <div id="dot-hero" className="absolute inset-0">
-            {!rich && <div className="absolute inset-[22%] rounded-full bg-purple" />}
+            {!rich && (
+              <div
+                className="absolute inset-[22%] rounded-full shadow-[inset_-18px_-26px_50px_rgba(36,22,64,.45)]"
+                style={{ background: 'radial-gradient(circle at 32% 26%, rgba(255,255,255,.55), transparent 26%), radial-gradient(circle at 50% 45%, #7d51d4, #6D3FC0 48%, #3B1F70 100%)' }}
+              />
+            )}
           </div>
           {chips.map((c) => (
-            <div key={c.text} className={`chip-fly absolute ${c.pos}`}>
+            <div key={c.text} className={`chip-fly absolute max-w-[82%] ${c.pos}`}>
               <span style={{ rotate: `${c.rot}deg` }} className="chip flex items-center gap-2 rounded-xl border border-hairline bg-white px-4 py-2.5 text-[13px] text-ink shadow-[0_10px_30px_-14px_rgba(59,31,112,.35)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-purple" />{c.text}
               </span>

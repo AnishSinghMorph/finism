@@ -13,7 +13,7 @@ function Orb() {
   const mesh = useRef<Mesh>(null)
   const cur = useRef<{ x: number; y: number; r: number } | null>(null)
 
-  useFrame(({ size, pointer }, dt) => {
+  useFrame(({ size, pointer, clock }, dt) => {
     const m = mesh.current
     if (!m) return
     const { width: vw, height: vh } = size
@@ -24,9 +24,11 @@ function Orb() {
     const hero = document.getElementById('dot-hero')?.getBoundingClientRect()
     if (hero) {
       const h = smooth(clamp(1 + hero.top / (hero.height * 0.55)))
-      x = M.lerp(x, hero.left + hero.width / 2 + pointer.x * 22, h)
-      y = M.lerp(y, hero.top + hero.height / 2 - pointer.y * 16, h)
-      r = M.lerp(r, hero.width * 0.26, h)
+      // gentle idle drift so it stays alive on touch screens, where there is no cursor to follow
+      const t = clock.elapsedTime
+      x = M.lerp(x, hero.left + hero.width / 2 + pointer.x * 22 + Math.sin(t * 0.7) * 5, h)
+      y = M.lerp(y, hero.top + hero.height / 2 - pointer.y * 16 + Math.sin(t * 0.9) * 5, h)
+      r = M.lerp(r, hero.width * (vw < 768 ? 0.36 : 0.26), h) // bigger share of the box on phones
     }
     const end = document.getElementById('dot-end')?.getBoundingClientRect()
     if (end) {
@@ -65,7 +67,7 @@ export default function Dot3D() {
     <Canvas
       orthographic
       camera={{ position: [0, 0, 600], zoom: 1, near: 1, far: 1200 }}
-      dpr={[1, 1.75]}
+      dpr={[1, 1.5]}
       eventSource={document.body}
       eventPrefix="client"
       gl={{ alpha: true, antialias: true }}

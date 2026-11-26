@@ -1,2 +1,2 @@
-// 3D dot only on wide screens without reduced-motion; everyone else gets flat CSS dots. Evaluated once.
-export const rich = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches
+// 3D dot everywhere except for visitors who ask for reduced motion (they get a static CSS sphere). Evaluated once.
+export const rich = window.matchMedia('(prefers-reduced-motion: no-preference)').matches
