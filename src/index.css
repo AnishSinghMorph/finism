@@ -43,3 +43,8 @@ html.lenis, html.lenis body { height: auto; }
   from { background-position: 0 0, 0 0; }
   to { background-position: 200% 0, -166.667% 0; }
 }
+
+/* Slow, quiet node breathing used by the network visuals. */
+@keyframes pulse-soft { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
+.pulse { animation: pulse-soft 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }

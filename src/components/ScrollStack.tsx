@@ -6,7 +6,8 @@ import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTran
 // Motion values only, so nothing re-renders while scrolling.
 
 type Mode = 'full' | 'soft' | 'list' // desktop / tablet (gentler) / phone or reduced motion (plain list)
-type Ctx = { progress: MotionValue<number>; n: number; mode: Mode }
+export type Variant = 'spin' | 'stack'
+type Ctx = { progress: MotionValue<number>; n: number; mode: Mode; variant: Variant }
 const Stack = createContext<Ctx>(null!)
 const CardPos = createContext<MotionValue<number>>(null!)
 
@@ -22,7 +23,7 @@ function useMode(): Mode {
   return reduce ? 'list' : mode
 }
 
-export function ScrollCardSection({ children, labels, className = '' }: { children: ReactNode; labels: string[]; className?: string }) {
+export function ScrollCardSection({ children, labels, className = '', variant = 'spin', step = 90 }: { children: ReactNode; labels: string[]; className?: string; variant?: Variant; step?: number }) {
   const n = Children.count(children)
   const mode = useMode()
   const root = useRef<HTMLDivElement>(null)
@@ -30,15 +31,15 @@ export function ScrollCardSection({ children, labels, className = '' }: { childr
 
   if (mode === 'list') {
     return (
-      <Stack.Provider value={{ progress: scrollYProgress, n, mode }}>
+      <Stack.Provider value={{ progress: scrollYProgress, n, mode, variant }}>
         <div className={`mx-auto grid max-w-3xl gap-5 ${className}`}>{children}</div>
       </Stack.Provider>
     )
   }
   return (
-    <Stack.Provider value={{ progress: scrollYProgress, n, mode }}>
+    <Stack.Provider value={{ progress: scrollYProgress, n, mode, variant }}>
       {/* tall track drives the animation; the sticky child keeps the stack on screen */}
-      <div ref={root} style={{ height: `${(n - 1) * 90 + 100}vh` }} className={className}>
+      <div ref={root} style={{ height: `${(n - 1) * step + 100}vh` }} className={className}>
         <div className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden">
           <div className="relative h-full w-full">{children}</div>
           <Dots labels={labels} />
@@ -83,23 +84,25 @@ function LayerMotion({ depth, className, children }: { depth: number; className:
 }
 
 export function ScrollCard({ index, children, className = '' }: { index: number; children: ReactNode; className?: string }) {
-  const { progress, n, mode } = useContext(Stack)
+  const { progress, n, mode, variant } = useContext(Stack)
   const shell = 'rounded-[2rem] border border-hairline bg-white shadow-[0_40px_80px_-44px_rgba(36,22,64,.4)]'
   if (mode === 'list') return <article className={`${shell} ${className}`}>{children}</article>
-  return <FullCard index={index} progress={progress} n={n} soft={mode === 'soft'} className={shell} inner={className}>{children}</FullCard>
+  return <FullCard index={index} progress={progress} n={n} soft={mode === 'soft'} variant={variant} className={shell} inner={className}>{children}</FullCard>
 }
 
-function FullCard({ index, progress, n, soft, className, inner, children }: { inner: string; index: number; progress: MotionValue<number>; n: number; soft: boolean; className: string; children: ReactNode }) {
-  // Spinner: the cards sit on an imaginary drum. Scrolling turns it, so the front card tips away (blurring out)
-  // while the next one tips in from below (blurring in).
+function FullCard({ index, progress, n, soft, variant, className, inner, children }: { variant: Variant; inner: string; index: number; progress: MotionValue<number>; n: number; soft: boolean; className: string; children: ReactNode }) {
+  // spin: the cards sit on an imaginary drum; the front one tips away (blurring out) as the next tips in from below.
+  // stack: a physical pile; cards behind are smaller, lower and veiled, the front one is sharp and dominant.
+  const spin = variant === 'spin'
   const k = soft ? 0.6 : 1
   const pos = useTransform(progress, (v) => v * (n - 1) - index)
-  const P = [-1.5, -1, -0.5, 0, 0.5, 1, 1.5]
-  const rotateX = useTransform(pos, P, [-85, -75, -42, 0, 42, 75, 85].map((v) => v * k))
-  const y = useTransform(pos, P, [150, 90, 40, 0, -40, -90, -150].map((v) => v * k))
-  const scale = useTransform(pos, P, [0.85, 0.9, 0.96, 1, 0.96, 0.9, 0.85])
-  const opacity = useTransform(pos, P, [0, 0.2, 0.7, 1, 0.7, 0.2, 0])
-  const blurPx = useTransform(pos, P, [14, 10, 4.5, 0, 4.5, 10, 14].map((v) => (soft ? v * 0.5 : v)))
+  const P = spin ? [-1.5, -1, -0.5, 0, 0.5, 1, 1.5] : [-1.5, -1, -0.5, 0, 0.5, 1, 1.5]
+  const rotateX = useTransform(pos, P, (spin ? [-85, -75, -42, 0, 42, 75, 85] : [0, 0, 0, 0, 0, 0, 0]).map((v) => v * k))
+  const y = useTransform(pos, P, (spin ? [150, 90, 40, 0, -40, -90, -150] : [90, 48, 22, 0, -16, -34, -52]).map((v) => v * k))
+  const scale = useTransform(pos, P, spin ? [0.85, 0.9, 0.96, 1, 0.96, 0.9, 0.85] : [0.88, 0.93, 0.965, 1, 0.985, 0.95, 0.92].map((v) => 1 - (1 - v) * k))
+  const opacity = useTransform(pos, P, spin ? [0, 0.2, 0.7, 1, 0.7, 0.2, 0] : [0, 1, 1, 1, 1, 1, 0])
+  const veil = useTransform(pos, P, spin ? [0, 0, 0, 0, 0, 0, 0] : [0.9, 0.5, 0.12, 0, 0.18, 0.55, 0.9]) // stack: pale film over cards further back
+  const blurPx = useTransform(pos, P, (spin ? [14, 10, 4.5, 0, 4.5, 10, 14] : [0, 0, 0, 0, 0, 0, 0]).map((v) => (soft ? v * 0.5 : v)))
   const filter = useTransform(blurPx, (b) => (b < 0.05 ? 'none' : `blur(${b.toFixed(2)}px)`))
   const z = useTransform(pos, (v) => Math.round(200 - Math.abs(v) * 100 + (v < 0 ? 40 : 0)))
 
@@ -130,8 +133,21 @@ function FullCard({ index, progress, n, soft, className, inner, children }: { in
           <motion.div style={{ x: bgX, y: bgY }} className={`relative ${inner}`}>
             <CardPos.Provider value={pos}>{children}</CardPos.Provider>
           </motion.div>
+          {!spin && <motion.div aria-hidden style={{ opacity: veil }} className="pointer-events-none absolute inset-0 z-10 bg-pale" />}
         </motion.div>
       </motion.div>
     </motion.div>
   )
+}
+
+// Image that drifts against the card as it moves through the stack (plain in list mode).
+export function ParallaxLayer({ className = '', amount = 28, children }: { className?: string; amount?: number; children: ReactNode }) {
+  const { mode } = useContext(Stack)
+  if (mode === 'list') return <div className={`overflow-hidden ${className}`}>{children}</div>
+  return <ParallaxMotion className={className} amount={amount}>{children}</ParallaxMotion>
+}
+function ParallaxMotion({ className, amount, children }: { className: string; amount: number; children: ReactNode }) {
+  const pos = useContext(CardPos)
+  const y = useTransform(pos, [-1, 0, 1], [amount, 0, -amount])
+  return <div className={`overflow-hidden ${className}`}><motion.div style={{ y, scale: 1.18 }} className="h-full w-full">{children}</motion.div></div>
 }

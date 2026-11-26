@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
-import { motion } from 'motion/react'
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react'
 import { ease } from '../../components/Reveal'
+import Photo from '../../components/Photo'
+import Magnetic from '../../components/Magnetic'
 import { rich } from '../../components/rich'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -24,6 +26,12 @@ const stages = [
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null)
+  // cinematic depth: the photo, the network over it and the chips each answer the pointer a little differently
+  const sp = { stiffness: 60, damping: 18 }
+  const mx = useMotionValue(0), my = useMotionValue(0)
+  const imgX = useSpring(useTransform(mx, [-0.5, 0.5], [-8, 8]), sp), imgY = useSpring(useTransform(my, [-0.5, 0.5], [-6, 6]), sp)
+  const { scrollYProgress } = useScroll({ target: root, offset: ['start start', 'end start'] })
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, 70])
 
   useGSAP(() => {
     gsap.from('.hero-line', { yPercent: 110, duration: 1.1, ease: 'power4.out', stagger: 0.12, delay: 0.15 })
@@ -41,6 +49,7 @@ export default function Hero() {
 
   return (
     <section ref={root} className="relative overflow-hidden px-6 pb-16 pt-36 md:pt-40">
+      <div aria-hidden className="absolute inset-0 -z-0 opacity-70" style={{ backgroundImage: 'linear-gradient(var(--color-hairline) 1px, transparent 1px), linear-gradient(90deg, var(--color-hairline) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(ellipse 70% 60% at 70% 40%, black, transparent)' }} />
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_0.95fr]">
         <div>
           <p className="eyebrow hero-fade">Global Capability Centres</p>
@@ -53,17 +62,29 @@ export default function Hero() {
             A launch is a milestone. A centre that keeps delivering business value is the outcome. Finism designs it around your operating objectives and stays accountable from first decision to scale.
           </p>
           <div className="hero-fade mt-9 flex flex-wrap gap-3">
-            <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
-              <Link to="/plan-your-gcc/readiness-check" className="inline-flex rounded-full bg-purple px-6 py-3.5 text-[15px] font-medium text-white">Plan a new GCC</Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
-              <Link to="/plan-your-gcc/strategy-session" className="inline-flex rounded-full border border-hairline px-6 py-3.5 text-[15px] font-medium text-deep hover:border-purple">Optimise an existing centre</Link>
-            </motion.div>
+            <Magnetic>
+              <Link to="/plan-your-gcc/readiness-check" className="group inline-flex items-center gap-2 rounded-full bg-purple px-6 py-3.5 text-[15px] font-medium text-white">Plan a new GCC <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span></Link>
+            </Magnetic>
+            <Magnetic>
+              <Link to="/plan-your-gcc/strategy-session" className="inline-flex rounded-full border border-hairline bg-white/60 px-6 py-3.5 text-[15px] font-medium text-deep hover:border-purple">Optimise an existing centre</Link>
+            </Magnetic>
           </div>
         </div>
 
-        <div className="relative mx-auto aspect-square w-full max-w-[520px]">
-          <div id="dot-hero" className="absolute inset-0">
+        <div
+          className="relative mx-auto aspect-[4/5] w-full max-w-[500px]"
+          onPointerMove={(e) => { if (e.pointerType !== 'mouse') return; const r = e.currentTarget.getBoundingClientRect(); mx.set((e.clientX - r.left) / r.width - 0.5); my.set((e.clientY - r.top) / r.height - 0.5) }}
+          onPointerLeave={() => { mx.set(0); my.set(0) }}
+        >
+          {/* architecture, graded toward the brand purple and faded into the page at the foot */}
+          <div id="dot-frame" aria-hidden className="pointer-events-none absolute inset-x-[4%] bottom-0 top-[4%]" />
+          <div className="hero-fade absolute inset-0"><motion.div style={{ x: imgX, y: imgY }} className="absolute inset-x-[4%] bottom-0 top-[4%]">
+            <motion.div style={{ y: photoY }} className="relative h-full overflow-hidden rounded-[2rem] [mask-image:linear-gradient(to_bottom,black_62%,transparent)]">
+              <Photo photo="towers" priority sizes="(min-width:768px) 480px, 90vw" className="scale-[1.12] saturate-[.8]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-deep/30 to-purple/25 mix-blend-multiply" />
+            </motion.div>
+          </motion.div></div>
+          <div id="dot-hero" className="absolute -left-[9%] top-[44%] aspect-square w-[42%]">
             {!rich && (
               <div
                 className="absolute inset-[22%] rounded-full shadow-[inset_-18px_-26px_50px_rgba(36,22,64,.45)]"

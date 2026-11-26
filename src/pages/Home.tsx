@@ -4,6 +4,9 @@ import Reveal from '../components/Reveal'
 import { BentoField, InteractiveCard } from '../components/BentoField'
 import Hero from './home/Hero'
 import Questions from './home/Questions'
+import Engine from './home/Engine'
+import ServiceStack from './home/ServiceStack'
+import CostCapability from './home/CostCapability'
 
 const different = [
   ['Experienced practitioners', 'Led by a founder who has built and run these centres.'],
@@ -49,6 +52,10 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      <Engine />
+      <ServiceStack />
+      <CostCapability />
 
       <Questions />
 
