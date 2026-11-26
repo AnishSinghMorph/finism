@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-deep: #3b1f70;
+  --color-ink: #241640;
+  --color-purple: #6d3fc0;
+  --color-muted: #726887;
+  --color-pale: #f4f1fb;
+  --color-hairline: #eae9f4;
+  --color-teal: #2cc7c2;
+  --color-gold: #d5a958;
+  --font-sans: "Nunito Sans", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+html { background: #fff; color: var(--color-ink); }
+body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--font-sans); color: var(--color-deep); letter-spacing: -0.02em; }
+/* accent phrase inside headings: <em>, same brand font, italic purple */
+h1 em, h2 em, h3 em { font-style: italic; font-weight: 400; color: var(--color-purple); }
+.eyebrow { font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-purple); }
+:focus-visible { outline: 2px solid var(--color-purple); outline-offset: 3px; border-radius: 6px; }
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+/* Flowing "water" border: two soft highlights sliding past each other at different speeds. Both gradients fade to
+   transparent at the edges so the loop is seamless. */
+.water-border {
+  background-color: var(--color-hairline);
+  background-image:
+    linear-gradient(100deg, transparent 0 20%, rgb(205 184 255 / 0.95) 35%, var(--color-purple) 50%, rgb(205 184 255 / 0.95) 65%, transparent 80% 100%),
+    linear-gradient(78deg, transparent 0 30%, rgb(109 63 192 / 0.55) 50%, transparent 70% 100%);
+  background-size: 200% 100%, 250% 100%;
+  background-repeat: repeat, repeat;
+  animation: water-flow 6s linear infinite;
+}
+@keyframes water-flow {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 200% 0, -166.667% 0; }
+}
