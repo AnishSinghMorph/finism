@@ -1,0 +1,42 @@
+// Assets exported from the Figma landing design (node 36:4), stored locally.
+import bandTalent from '../../assets/landing/band-talent.jpg'
+import bandBusiness from '../../assets/landing/band-business.jpg'
+import bandControl from '../../assets/landing/band-control.jpg'
+import bandIntegration from '../../assets/landing/band-integration.jpg'
+import bandSuccess from '../../assets/landing/band-success.jpg'
+import journeyPhoto from '../../assets/landing/journey-photo.jpg'
+import indiaPhoto from '../../assets/landing/india-photo.jpg'
+import diffBg from '../../assets/landing/diff-bg.svg'
+import heroGlow from '../../assets/landing/hero-ellipse-a.svg'
+import heroSphere from '../../assets/landing/hero-ellipse-b.svg'
+import logoNav from '../../assets/landing/logo-nav.svg'
+import arrowInk from '../../assets/landing/arrow-up-right-ink.svg'
+import headline from '../../assets/landing/headline.svg'
+import chipDotA from '../../assets/landing/chip-dot-a.svg'
+import chipDotB from '../../assets/landing/chip-dot-b.svg'
+import circleCore from '../../assets/landing/circle-core.svg'
+import ringDashed from '../../assets/landing/ring-dashed.svg'
+import logoCore from '../../assets/landing/logo-core.svg'
+import ringDot from '../../assets/landing/ring-dot.svg'
+import cursor from '../../assets/landing/cursor.svg'
+import arrowCircle from '../../assets/landing/arrow-circle.svg'
+import arrowWhite from '../../assets/landing/arrow-up-right-white.svg'
+import arrowCircleBig from '../../assets/landing/arrow-circle-big.svg'
+import arrowGlyphBig from '../../assets/landing/arrow-glyph-big.svg'
+import arrowRightWhite from '../../assets/landing/arrow-right-white.svg'
+import arrowRightMuted from '../../assets/landing/arrow-right-muted.svg'
+import docOutline from '../../assets/landing/doc-outline.svg'
+import docLines from '../../assets/landing/doc-lines.svg'
+import globeVector from '../../assets/landing/globe-vector.svg'
+import globeGroup from '../../assets/landing/globe-group.svg'
+import divider from '../../assets/landing/divider.svg'
+import dotPurple from '../../assets/landing/dot-purple.svg'
+import dotWhite from '../../assets/landing/dot-white.svg'
+import logoBig from '../../assets/landing/logo-big.svg'
+import arrowDark from '../../assets/landing/arrow-up-right-dark.svg'
+
+export const A = {
+  bandTalent, bandBusiness, bandControl, bandIntegration, bandSuccess, journeyPhoto, indiaPhoto, diffBg, heroGlow, heroSphere, logoNav, arrowInk,
+  headline, chipDotA, chipDotB, circleCore, ringDashed, logoCore, ringDot, cursor, arrowCircle, arrowWhite, arrowCircleBig, arrowGlyphBig,
+  arrowRightWhite, arrowRightMuted, docOutline, docLines, globeVector, globeGroup, divider, dotPurple, dotWhite, logoBig, arrowDark,
+}

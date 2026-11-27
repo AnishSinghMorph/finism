@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import Logo from './Logo'
+import logoNav from '../assets/landing/logo-nav.svg'
 import { cta, nav } from '../routes'
 
 export default function Nav() {
@@ -9,6 +10,8 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [menu, setMenu] = useState(false)
   const { pathname } = useLocation()
+  const home = pathname === '/'
+  const light = home && !scrolled // landing: transparent over the black hero, white type, gold button
 
   useEffect(() => setMenu(false), [pathname])
 
@@ -25,19 +28,19 @@ export default function Nav() {
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border px-6 py-3 transition-colors duration-300 ${
+        className={`mx-auto flex ${light ? 'max-w-[79.17vw] px-0' : 'max-w-6xl px-6'} items-center justify-between rounded-full border py-3 transition-[colors,max-width,padding] duration-300 ${
           scrolled ? 'border-hairline bg-white/80 shadow-[0_8px_30px_-12px_rgba(59,31,112,.25)] backdrop-blur-xl' : 'border-transparent bg-transparent'
         }`}
         aria-label="Primary"
         onMouseLeave={() => setOpen(null)}
       >
-        <Link to="/" className="text-2xl" aria-label="Finism home"><Logo /></Link>
+        <Link to="/" className="text-2xl" aria-label="Finism home">{light ? <img src={logoNav} alt="Finism" className="h-auto w-[max(96px,6.15vw)]" /> : <Logo reverse={light} />}</Link>
         <ul className="hidden items-center gap-1 md:flex">
           {nav.map((item) => (
             <li key={item.label} className="relative" onMouseEnter={() => setOpen(item.label)} onFocus={() => setOpen(item.label)}>
               <NavLink
                 to={item.to}
-                className={({ isActive }) => `relative block rounded-full px-4 py-2 text-sm transition-colors hover:text-purple ${isActive ? 'text-purple' : 'text-ink'}`}
+                className={({ isActive }) => `relative block rounded-full px-4 py-2 text-sm transition-colors ${light ? 'text-[max(11px,0.625vw)] font-medium text-white hover:text-cta' : `hover:text-purple ${isActive ? 'text-purple' : 'text-ink'}`}`}
               >
                 {item.label}{item.children && <span aria-hidden className="ml-1 text-[10px]">▾</span>}
               </NavLink>
@@ -63,7 +66,7 @@ export default function Nav() {
         </ul>
         <div className="flex items-center gap-2">
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-            <Link to={cta.to} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-purple px-3.5 py-2 text-[13px] font-medium text-white sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm">
+            <Link to={cta.to} className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-medium sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm ${home ? 'bg-cta font-bold text-deep' : 'bg-purple text-white'} ${light ? 'md:h-[max(44px,2.76vw)] md:w-[max(140px,8.9vw)] md:justify-center md:px-0 md:text-[max(11px,0.625vw)]' : ''}`}>
               {cta.label} <span aria-hidden>↗</span>
             </Link>
           </motion.div>

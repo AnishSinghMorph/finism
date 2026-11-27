@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
+import LandingOrb, { landing } from './LandingOrb'
 import { EquirectangularReflectionMapping, MathUtils as M, SRGBColorSpace, TextureLoader, type DirectionalLight, type Mesh, type MeshPhysicalMaterial, type Texture } from 'three'
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v))
@@ -89,6 +90,7 @@ function Orb() {
       if (q.top < vh && q.bottom > 0) { r = 0; shared.hide = true }
     })
 
+    if (landing.on) r = 0 // the landing page has its own orb (LandingOrb)
     const c = (cur.current ??= { x, y, r })
     c.x = M.damp(c.x, x, 14, dt)
     c.y = M.damp(c.y, y, 14, dt)
@@ -195,6 +197,7 @@ export default function Dot3D() {
     >
       <Lights />
       <Orb />
+      <LandingOrb />
       <Satellite phase={1.2} speed={0.55} rad={2.1} moon={0.17} delay={0} />
       <Satellite phase={3.9} speed={-0.38} rad={2.7} moon={0.1} delay={0.04} />
       <Satellite phase={5.6} speed={0.8} rad={1.75} moon={0.12} delay={0.08} />

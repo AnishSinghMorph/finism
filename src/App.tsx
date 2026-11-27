@@ -78,7 +78,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </motion.main>
-      <Footer />
+      {location.pathname !== '/' && <Footer />}
       {rich && <Suspense fallback={null}><Dot3D /></Suspense>}
     </>
   )
