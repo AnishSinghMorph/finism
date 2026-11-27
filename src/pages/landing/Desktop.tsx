@@ -99,7 +99,6 @@ export default function Desktop() {
       <Chip cx={336.07} cy={694.68} w={268} rot={-5.7} text="Fragmented delivery" dot={IMG.chipDotA} depth={90} />
       <Chip cx={1632.5} cy={674.5} w={279} rot={-1.05} text="Unclear accountability" dot={IMG.chipDotB} depth={70} />
       <Chip cx={1326.5} cy={827.5} w={227} rot={7.07} text="Difficulty scaling" dot={IMG.chipDotB} depth={110} />
-      <A x={1205} y={776} w={28} h={30}><img alt="" src={IMG.cursor} className="h-full w-full -scale-x-100" /></A>
       <A x={528} y={977} w={865} className="text-center font-body font-medium text-muted" style={{ fontSize: fs(24), lineHeight: 'normal' }}>
         Challenges we solve: fragmented delivery, unclear accountability, difficulty scaling, and centres that are not delivering what was planned.
       </A>

@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
+import CustomCursor from './components/CustomCursor'
 import { useSmoothScroll } from './components/useSmoothScroll'
 import { pages } from './routes'
 import { guides } from './content'
@@ -61,6 +62,7 @@ export default function App() {
   return (
     <>
       <Nav />
+      <CustomCursor />
       {/* No exit animation: unmounting the old page before the new one mounts leaves <main> empty and the footer jumps to the top. */}
       <motion.main
         key={location.pathname}

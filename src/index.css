@@ -71,3 +71,7 @@ html.lenis, html.lenis body { height: auto; }
 /* Landing page */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* The site's own cursor (see CustomCursor): hide the system one, but keep it over text fields. */
+html.custom-cursor, html.custom-cursor * { cursor: none !important; }
+html.custom-cursor input, html.custom-cursor textarea, html.custom-cursor select { cursor: auto !important; }
