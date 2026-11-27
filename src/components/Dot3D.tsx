@@ -34,7 +34,7 @@ function Orb() {
     shared.arc = arc
     const time = clock.elapsedTime
 
-    let x = lane.x, y = lane.y, r = 9
+    let x = lane.x, y = lane.y, r = vw < 768 ? 0 : 9 // phones: no dot riding over the text; it returns to dock on the footer
     shared.t = 0
     shared.hero = !!document.getElementById('dot-hero') // the small moons belong to the home hero only
     const intro = smooth(clamp((time - 0.5) / 1.8)) // on arrival the orb rises into place, like a sun clearing the towers
@@ -54,7 +54,7 @@ function Orb() {
       const dx = lane.x - ax
       x = bez(ax, ax + dx * 0.3, lane.x - dx * 0.05, lane.x, e)
       y = bez(ay, ay + 40 * arc, lane.y + 150 * arc, lane.y, e) // one long diagonal sweep up and out to the right, no bounce
-      r = r0 * sizeAt(t) * (1 + 0.015 * Math.sin(time * 1.1)) * intro // very small breathing
+      r = r0 * sizeAt(t) * (1 + 0.015 * Math.sin(time * 1.1)) * intro * (vw < 768 ? 1 - smooth(clamp((t - 0.55) / 0.35)) : 1) // very small breathing
       y += (1 - intro) * 70 * (1 - e)
     }
 
@@ -145,7 +145,7 @@ function Satellite({ phase, speed, rad, moon, delay }: { phase: number; speed: n
     const { width: vw, height: vh } = size
     const time = clock.elapsedTime
     let x = shared.x, y = shared.y, r = 0, z = 0
-    if (shared.hero && !shared.hide && shared.t < 1 && shared.r > 1) {
+    if (shared.hero && size.width >= 768 && !shared.hide && shared.t < 1 && shared.r > 1) { // phones: the main orb only
       const a = time * speed + phase
       const R = shared.r * rad
       const ax = shared.x + Math.cos(a) * R, ay = shared.y + Math.sin(a) * R * 0.38 - Math.cos(a) * R * 0.12 // tilted ellipse

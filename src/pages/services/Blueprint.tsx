@@ -15,6 +15,13 @@ const ease = (t: number) => t * t * (3 - 2 * t)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 const win = (p: number, a: number, b: number) => ease(c01((p - a) / (b - a)))
 const CX = 50, CY = 31.25
+// Desktop is a 100 x 62.5 stage. Phones get a tall stage (y stretched by sy) with larger modules (k) so it stays legible.
+// (Set once per render by <Blueprint>; only one exists at a time.)
+const DESK = { sy: 1, k: 1, H: 62.5, big: 3.2 }
+const PHONE = { sy: 1.9, k: 2, H: 118.75, big: 2.6 }
+let G = DESK
+const Y = (v: number) => v * G.sy
+const cyv = () => CY * G.sy
 
 type Key = 'talent' | 'workspace' | 'infrastructure' | 'operations' | 'consulting' | 'governance'
 type Mod = { k: Key; row: number; x: number; y: number; from: [number, number, number]; w: [number, number]; photo?: keyof typeof photos; big?: boolean; up?: boolean }
@@ -32,12 +39,12 @@ function layout(v: number, m: Mod) {
   let x: number, y: number, s: number, o: number, b: number
   if (m.big) { // the workspace image arrives huge, then becomes its module: one object changing role
     const fade = win(v, m.w[0], m.w[0] + 0.03), travel = win(v, 0.44, m.w[1])
-    x = (CX - m.x) * (1 - travel); y = (CY - m.y) * (1 - travel); s = lerp(3.2, 1, travel); o = fade; b = lerp(4, 0, fade)
+    x = (CX - m.x) * (1 - travel); y = (cyv() - Y(m.y)) * (1 - travel); s = lerp(G.big, 1, travel); o = fade; b = lerp(4, 0, fade)
   } else {
     const e = win(v, m.w[0], m.w[1])
     x = m.from[0] * (1 - e); y = m.from[1] * (1 - e); s = lerp(m.from[2], 1, e); o = e; b = lerp(4, 0, e)
   }
-  return { x: x * (1 - c) + (CX - m.x) * c, y: y * (1 - c) + (CY - m.y) * c, s: s * (1 - 0.75 * c), o: o * (1 - c), b }
+  return { x: x * (1 - c) + (CX - m.x) * c, y: y * (1 - c) + (cyv() - Y(m.y)) * c, s: s * (1 - 0.75 * c), o: o * (1 - c), b }
 }
 
 const useW = (p: MotionValue<number>, a: number, b: number) => useTransform(p, (v) => win(v, a, b))
@@ -78,11 +85,12 @@ function Module({ m, p, stage }: { m: Mod; p: MotionValue<number>; stage: RefObj
   }
   return (
     <motion.div
-      style={{ x, y, scale, opacity, filter, left: `${m.x}cqw`, top: `${m.y}cqw`, zIndex: m.big ? 30 : 10, pointerEvents: live }}
-      className="absolute w-[18cqw] -translate-x-1/2 -translate-y-1/2"
+      style={{ x, y, scale, opacity, filter, left: `${m.x}cqw`, top: `${Y(m.y)}cqw`, zIndex: m.big ? 30 : 10, pointerEvents: live, width: `${18 * G.k}cqw` }}
+      className="absolute -translate-x-1/2 -translate-y-1/2"
     >
       <div
-        className="bp-mod relative h-[11.5cqw] overflow-hidden rounded-[1cqw] border border-white/25 bg-[#2d1a52] shadow-[0_2cqw_3cqw_-1.5cqw_rgb(0_0_0/.55)] [translate:calc(var(--px,0)*.5cqw)_calc(var(--py,0)*.4cqw)]"
+        style={{ height: `${(G.k > 1 ? 9.4 : 11.5) * G.k}cqw`, borderRadius: `${G.k}cqw` }}
+        className="bp-mod relative overflow-hidden border border-white/25 bg-[#2d1a52] shadow-[0_2cqw_3cqw_-1.5cqw_rgb(0_0_0/.55)] [translate:calc(var(--px,0)*.5cqw)_calc(var(--py,0)*.4cqw)]"
         onPointerEnter={(e) => on(e.currentTarget, true)}
         onPointerLeave={(e) => { on(e.currentTarget, false); e.currentTarget.style.setProperty('--px', '0'); e.currentTarget.style.setProperty('--py', '0') }}
         onPointerMove={(e) => { if (e.pointerType !== 'mouse') return; const r = e.currentTarget.getBoundingClientRect(); e.currentTarget.style.setProperty('--px', String((e.clientX - r.left) / r.width - 0.5)); e.currentTarget.style.setProperty('--py', String((e.clientY - r.top) / r.height - 0.5)) }}
@@ -93,15 +101,15 @@ function Module({ m, p, stage }: { m: Mod; p: MotionValue<number>; stage: RefObj
           </motion.div>
         ) : <Glyph k={m.k} />}
         <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-deep/20 to-transparent" />
-        <div aria-hidden className="absolute inset-[0.8cqw] rounded-[.5cqw] border border-white/15" />
-        <div className="absolute inset-x-[1.2cqw] bottom-[1cqw] text-white">
-          <span className="block text-[0.85cqw] tracking-[0.18em] text-white/60">0{m.row + 1}</span>
-          <span className="block font-sans text-[1.5cqw] font-medium leading-tight">{name}</span>
+        <div aria-hidden className="absolute rounded-[.5cqw] border border-white/15" style={{ inset: `${0.8 * G.k}cqw` }} />
+        <div className="absolute text-white" style={{ left: `${1.2 * G.k}cqw`, right: `${1.2 * G.k}cqw`, bottom: `${G.k}cqw` }}>
+          <span className="block tracking-[0.18em] text-white/60" style={{ fontSize: `${0.85 * G.k}cqw` }}>0{m.row + 1}</span>
+          <span className="block font-sans font-medium leading-tight" style={{ fontSize: `${1.5 * G.k}cqw` }}>{name}</span>
         </div>
       </div>
-      <div className={`bp-panel absolute left-0 z-40 w-full rounded-[.8cqw] border border-white/20 bg-ink/95 p-[1cqw] text-[1cqw] leading-snug text-white/85 ${m.up ? 'bottom-full mb-[.8cqw]' : 'top-full mt-[.8cqw]'}`}>
+      <div className={`bp-panel absolute left-0 z-40 w-full rounded-[.8cqw] border border-white/20 bg-ink/95 p-[1cqw] leading-snug text-white/85 ${m.up ? 'bottom-full mb-[.8cqw]' : 'top-full mt-[.8cqw]'}`} style={{ fontSize: `${1 * G.k * (G.k > 1 ? 1.3 : 1)}cqw`, padding: `${G.k}cqw` }}>
         {[['Strategy', strat], ['Setup', setup], ['Operate', oper]].map(([l, t]) => (
-          <p key={l} className="mb-[.5cqw] last:mb-0"><span className="mr-[.6cqw] text-[.85cqw] uppercase tracking-[.14em] text-[#cdb8ff]">{l}</span>{t}</p>
+          <p key={l} className="mb-[.5cqw] last:mb-0"><span className="mr-[.6cqw] uppercase tracking-[.14em] text-[#cdb8ff]" style={{ fontSize: `${0.85 * G.k}cqw` }}>{l}</span>{t}</p>
         ))}
       </div>
     </motion.div>
@@ -117,22 +125,22 @@ function Draw({ p, a, b, d, className = '', stroke = '#fff', sw = 0.12, op = 0.3
 
 const talentPts = [[44, 17], [50, 16], [56, 17], [47, 21], [53, 21], [41, 22], [59, 22], [50, 24], [45, 25], [55, 25], [38, 19], [62, 19]]
 const talentLinks = [[0, 1], [1, 2], [0, 3], [1, 3], [1, 4], [2, 4], [3, 5], [4, 6], [3, 7], [4, 7], [7, 8], [7, 9], [5, 10], [6, 11], [0, 10], [2, 11]]
-const routePath = (m: Mod) => (m.x === 50 ? `M${m.x} ${m.y} L${CX} ${CY}` : `M${m.x} ${m.y} Q${CX} ${m.y} ${CX} ${CY}`)
-const ringLinks: [Mod['k'], Mod['k'], string][] = [
-  ['workspace', 'infrastructure', 'M22 18 L22 45'], ['operations', 'governance', 'M78 18 L78 45'],
-  ['talent', 'workspace', 'M50 8 Q22 8 22 18'], ['talent', 'operations', 'M50 8 Q78 8 78 18'],
-  ['consulting', 'infrastructure', 'M50 54.5 Q22 54.5 22 45'], ['consulting', 'governance', 'M50 54.5 Q78 54.5 78 45'],
+const routePath = (m: Mod) => (m.x === 50 ? `M${m.x} ${Y(m.y)} L${CX} ${cyv()}` : `M${m.x} ${Y(m.y)} Q${CX} ${Y(m.y)} ${CX} ${cyv()}`)
+const ringLinks = (): [Mod['k'], Mod['k'], string][] => [
+  ['workspace', 'infrastructure', `M22 ${Y(18)} L22 ${Y(45)}`], ['operations', 'governance', `M78 ${Y(18)} L78 ${Y(45)}`],
+  ['talent', 'workspace', `M50 ${Y(8)} Q22 ${Y(8)} 22 ${Y(18)}`], ['talent', 'operations', `M50 ${Y(8)} Q78 ${Y(8)} 78 ${Y(18)}`],
+  ['consulting', 'infrastructure', `M50 ${Y(54.5)} Q22 ${Y(54.5)} 22 ${Y(45)}`], ['consulting', 'governance', `M50 ${Y(54.5)} Q78 ${Y(54.5)} 78 ${Y(45)}`],
 ]
 
 function TalentNode({ p, i }: { p: MotionValue<number>; i: number }) {
-  const [fx, fy] = talentPts[i]
+  const fx = talentPts[i][0], fy = Y(talentPts[i][1])
   const e = useW(p, 0.3 + i * 0.006, 0.42 + i * 0.004)
-  const cx = useTransform(e, (t) => lerp(CX + (fx - CX) * 6, fx, t)), cy = useTransform(e, (t) => lerp(CY + (fy - CY) * 6, fy, t))
+  const cx = useTransform(e, (t) => lerp(CX + (fx - CX) * 6, fx, t)), cy = useTransform(e, (t) => lerp(cyv() + (fy - cyv()) * 6, fy, t))
   return <motion.circle cx={cx} cy={cy} r={0.55} fill="#F4F1FB" style={{ opacity: e }} />
 }
 function TalentLink({ p, a, b }: { p: MotionValue<number>; a: number; b: number }) {
   const o = useW(p, 0.42, 0.5)
-  const [x1, y1] = talentPts[a], [x2, y2] = talentPts[b]
+  const x1 = talentPts[a][0], y1 = Y(talentPts[a][1]), x2 = talentPts[b][0], y2 = Y(talentPts[b][1])
   return <motion.line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#cdb8ff" strokeWidth=".1" style={{ opacity: useTransform(o, (v) => v * 0.55) }} />
 }
 
@@ -149,21 +157,21 @@ function Structure({ p }: { p: MotionValue<number> }) {
     <motion.g style={{ scale, opacity, transformBox: 'fill-box', transformOrigin: 'center' }}>
       {/* strategy: a foundation plate */}
       <motion.g style={{ opacity: plate, scale: plateS, transformBox: 'fill-box', transformOrigin: 'center' }}>
-        <rect x="19" y="9" width="62" height="44" rx="1.5" fill="rgb(255 255 255 / .035)" stroke="#fff" strokeOpacity=".25" strokeWidth=".15" />
-        <rect x="23" y="13" width="54" height="36" rx="1" fill="none" stroke="#cdb8ff" strokeOpacity=".3" strokeWidth=".12" strokeDasharray="1 1.4" />
+        <rect x="19" y={Y(9)} width="62" height={Y(44)} rx="1.5" fill="rgb(255 255 255 / .035)" stroke="#fff" strokeOpacity=".25" strokeWidth=".15" />
+        <rect x="23" y={Y(13)} width="54" height={Y(36)} rx="1" fill="none" stroke="#cdb8ff" strokeOpacity=".3" strokeWidth=".12" strokeDasharray="1 1.4" />
       </motion.g>
       {/* setup: a structural frame grows around it */}
-      <Draw p={p} a={0.2} b={0.3} d="M9 9 V3 H17" op={0.7} sw={0.22} /><Draw p={p} a={0.21} b={0.31} d="M83 3 H91 V9" op={0.7} sw={0.22} />
-      <Draw p={p} a={0.22} b={0.32} d="M91 53 V59 H83" op={0.7} sw={0.22} /><Draw p={p} a={0.23} b={0.33} d="M17 59 H9 V53" op={0.7} sw={0.22} />
-      <Draw p={p} a={0.24} b={0.34} d="M9 9 V53" op={0.22} dash="1 1.2" /><Draw p={p} a={0.24} b={0.34} d="M91 9 V53" op={0.22} dash="1 1.2" />
+      <Draw p={p} a={0.2} b={0.3} d={`M9 ${Y(9)} V${Y(3)} H17`} op={0.7} sw={0.22} /><Draw p={p} a={0.21} b={0.31} d={`M83 ${Y(3)} H91 V${Y(9)}`} op={0.7} sw={0.22} />
+      <Draw p={p} a={0.22} b={0.32} d={`M91 ${Y(53)} V${Y(59)} H83`} op={0.7} sw={0.22} /><Draw p={p} a={0.23} b={0.33} d={`M17 ${Y(59)} H9 V${Y(53)}`} op={0.7} sw={0.22} />
+      <Draw p={p} a={0.24} b={0.34} d={`M9 ${Y(9)} V${Y(53)}`} op={0.22} dash="1 1.2" /><Draw p={p} a={0.24} b={0.34} d={`M91 ${Y(9)} V${Y(53)}`} op={0.22} dash="1 1.2" />
       {/* workspace: architectural planes slide in and lock */}
-      <motion.polygon points="6,22 36,22 32,42 2,42" fill="rgb(255 255 255 / .04)" stroke="#fff" strokeOpacity=".2" strokeWidth=".12" style={{ x: planeAx, opacity: planeA }} data-for="workspace" />
-      <motion.polygon points="30,50 70,50 74,56 26,56" fill="rgb(255 255 255 / .04)" stroke="#fff" strokeOpacity=".2" strokeWidth=".12" style={{ y: planeBy, opacity: planeB }} />
+      <motion.polygon points={`6,${Y(22)} 36,${Y(22)} 32,${Y(42)} 2,${Y(42)}`} fill="rgb(255 255 255 / .04)" stroke="#fff" strokeOpacity=".2" strokeWidth=".12" style={{ x: planeAx, opacity: planeA }} data-for="workspace" />
+      <motion.polygon points={`30,${Y(50)} 70,${Y(50)} 74,${Y(56)} 26,${Y(56)}`} fill="rgb(255 255 255 / .04)" stroke="#fff" strokeOpacity=".2" strokeWidth=".12" style={{ y: planeBy, opacity: planeB }} />
       {/* talent: nodes arrive from beyond the edges and assemble */}
       <g data-for="talent">{talentLinks.map(([a, b]) => <TalentLink key={`${a}-${b}`} p={p} a={a} b={b} />)}{talentPts.map((_, i) => <TalentNode key={i} p={p} i={i} />)}</g>
       {/* infrastructure: routes draw themselves */}
       {mods.map((m) => <Draw key={m.k} p={p} a={m.w[1] - 0.02} b={m.w[1] + 0.06} d={routePath(m)} stroke="#cdb8ff" sw={0.16} op={0.75} className="[filter:drop-shadow(0_0_.35px_#a78bfa)]" forKey={m.k} />)}
-      {ringLinks.map(([a, b, d]) => <Draw key={d} p={p} a={0.54} b={0.64} d={d} stroke="#cdb8ff" sw={0.12} op={0.4} dash="0.8 1" forKey={`${a} ${b}`} />)}
+      {ringLinks().map(([a, b, d]) => <Draw key={d} p={p} a={0.54} b={0.64} d={d} stroke="#cdb8ff" sw={0.12} op={0.4} dash="0.8 1" forKey={`${a} ${b}`} />)}
       {/* operations: signals travel the routes */}
       <motion.g style={{ opacity: sig }}>
         {mods.map((m, i) => (
@@ -171,8 +179,8 @@ function Structure({ p }: { p: MotionValue<number> }) {
         ))}
       </motion.g>
       {/* governance: a control ring closes around everything */}
-      <motion.ellipse cx={CX} cy={CY} rx="47" ry="29.5" fill="none" stroke="#a78bfa" strokeWidth=".22" style={{ pathLength: ring, opacity: useTransform(ring, (v) => (v > 0 ? 0.8 : 0)) }} data-for="governance" />
-      <motion.circle cx={CX} cy={CY} r="9.5" fill="none" stroke="#a78bfa" strokeWidth=".15" strokeDasharray="1 1" style={{ pathLength: ring, opacity: useTransform(ring, (v) => (v > 0 ? 0.7 : 0)) }} data-for="governance" />
+      <motion.ellipse cx={CX} cy={cyv()} rx="47" ry={29.5 * G.sy} fill="none" stroke="#a78bfa" strokeWidth=".22" style={{ pathLength: ring, opacity: useTransform(ring, (v) => (v > 0 ? 0.8 : 0)) }} data-for="governance" />
+      <motion.circle cx={CX} cy={cyv()} r={9.5 * G.k * 0.8} fill="none" stroke="#a78bfa" strokeWidth=".15" strokeDasharray="1 1" style={{ pathLength: ring, opacity: useTransform(ring, (v) => (v > 0 ? 0.7 : 0)) }} data-for="governance" />
     </motion.g>
   )
 }
@@ -180,12 +188,12 @@ function Structure({ p }: { p: MotionValue<number> }) {
 // the compact system the blueprint collapses into
 function Mini({ p }: { p: MotionValue<number> }) {
   const o = useW(p, 0.88, 0.95)
-  const pts = [0, 1, 2, 3, 4, 5].map((i) => { const a = (i * 60 - 90) * Math.PI / 180; return [CX + Math.cos(a) * 9, 26 + Math.sin(a) * 5.6] })
+  const pts = [0, 1, 2, 3, 4, 5].map((i) => { const a = (i * 60 - 90) * Math.PI / 180; return [CX + Math.cos(a) * 9 * G.k * 0.75, Y(26) + Math.sin(a) * 5.6 * G.sy * 0.85] })
   return (
     <motion.g style={{ opacity: o }}>
-      <ellipse cx={CX} cy="26" rx="9" ry="5.6" fill="none" stroke="#cdb8ff" strokeOpacity=".4" strokeWidth=".14" />
-      {pts.map(([x, y], i) => <g key={i}><line x1={CX} y1="26" x2={x} y2={y} stroke="#cdb8ff" strokeOpacity=".5" strokeWidth=".14" /><circle cx={x} cy={y} r=".9" fill="#F4F1FB" className="pulse" style={{ animationDelay: `${i * 0.8}s` }} /></g>)}
-      <circle cx={CX} cy="26" r="2" fill="#6D3FC0" />
+      <ellipse cx={CX} cy={Y(26)} rx={9 * G.k * 0.75} ry={5.6 * G.sy * 0.85} fill="none" stroke="#cdb8ff" strokeOpacity=".4" strokeWidth=".14" />
+      {pts.map(([x, y], i) => <g key={i}><line x1={CX} y1={Y(26)} x2={x} y2={y} stroke="#cdb8ff" strokeOpacity=".5" strokeWidth=".14" /><circle cx={x} cy={y} r=".9" fill="#F4F1FB" className="pulse" style={{ animationDelay: `${i * 0.8}s` }} /></g>)}
+      <circle cx={CX} cy={Y(26)} r={2 * G.k * 0.8} fill="#6D3FC0" />
     </motion.g>
   )
 }
@@ -224,14 +232,13 @@ function RailLabel({ p, l, a, b }: { p: MotionValue<number>; l: string; a: numbe
   return <motion.span style={{ opacity }} className="text-white">{l}</motion.span>
 }
 
-function useStatic() {
-  const reduce = useReducedMotion()
-  const [narrow, setNarrow] = useState(false)
+function useNarrow() {
+  const [narrow, setNarrow] = useState(() => matchMedia('(max-width: 767px)').matches)
   useEffect(() => {
-    const mq = matchMedia('(max-width: 767px)'); const s = () => setNarrow(mq.matches); s()
+    const mq = matchMedia('(max-width: 767px)'); const s = () => setNarrow(mq.matches)
     mq.addEventListener('change', s); return () => mq.removeEventListener('change', s)
   }, [])
-  return reduce || narrow
+  return narrow
 }
 
 const cta = { label: 'Take the Readiness Check', to: '/plan-your-gcc/readiness-check' }
@@ -270,11 +277,14 @@ export default function Blueprint(): ReactNode {
   const root = useRef<HTMLDivElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const { scrollYProgress: p } = useScroll({ target: root, offset: ['start start', 'end end'] })
-  const still = useStatic()
+  const still = !!useReducedMotion()
+  const narrow = useNarrow()
+  G = narrow ? PHONE : DESK
+  const k = G.k
 
   // perspective: the blueprint starts laid back and settles flat as it completes
   const tilt = useTransform(p, (v) => lerp(14, 0, win(v, 0, 0.78)))
-  const lift = useTransform(p, (v) => `${lerp(3, 0, win(v, 0, 0.78))}cqw`)
+  const lift = useTransform(p, (v) => `${lerp(3, 0, win(v, 0, 0.78)) * (narrow ? 0.5 : 1)}cqw`)
   const gridO = useTransform(p, (v) => lerp(0.35, 0.7, win(v, 0, 0.3)))
   const axes = useW(p, 0, 0.07)
   const axesO = useTransform(p, (v) => (0.5 - 0.3 * win(v, 0.1, 0.3)) * (1 - win(v, 0.84, 0.92)))
@@ -289,9 +299,9 @@ export default function Blueprint(): ReactNode {
   if (still) return <BlueprintStatic />
 
   return (
-    <div ref={root} style={{ height: '860vh' }} data-no-dot>
+    <div ref={root} style={{ height: narrow ? '640vh' : '860vh' }} data-no-dot>
       <div className="sticky top-0 grid h-[100svh] place-items-end overflow-hidden bg-ink pb-16 [perspective:1800px]">
-        <div className="absolute left-[max(1.5rem,calc(50%-34rem))] top-24 z-30 h-28 w-[min(34rem,42vw)]">
+        <div className="absolute left-6 top-20 z-30 h-28 w-[calc(100vw-3rem)] md:left-[max(1.5rem,calc(50%-34rem))] md:top-24 md:w-[min(34rem,42vw)]">
           <p className="eyebrow mb-3 !text-white/50">The GCC blueprint</p>
           <div className="relative">
             <Caption p={p} a={-0.1} b={0.09} t="An idea." s="A faint grid and one point. This is where every GCC starts." />
@@ -301,26 +311,26 @@ export default function Blueprint(): ReactNode {
           </div>
         </div>
 
-        <motion.div ref={stage} style={{ rotateX: tilt, y: lift, transformPerspective: 1800 }} className="bp relative mb-10 aspect-[16/10] w-[min(86vw,calc((100svh-13rem)*1.6))] [container-type:inline-size]">
+        <motion.div ref={stage} style={{ rotateX: tilt, y: lift, transformPerspective: 1800, aspectRatio: `100 / ${G.H}` }} className={`bp relative [container-type:inline-size] ${narrow ? 'mb-4 w-[94vw]' : 'mb-10 w-[min(86vw,calc((100svh-13rem)*1.6))]'}`}>
           <motion.div aria-hidden style={{ opacity: gridO, backgroundImage: 'linear-gradient(rgb(255 255 255 / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .06) 1px, transparent 1px)', backgroundSize: '3.125cqw 3.125cqw', maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)' }} className="absolute -inset-[10%]" />
-          <svg aria-hidden viewBox="0 0 100 62.5" className="absolute inset-0 h-full w-full overflow-visible">
-            <motion.path d="M6 31.25 H94" stroke="#fff" strokeWidth=".1" strokeDasharray="1 1.2" style={{ pathLength: axes, opacity: axesO }} fill="none" />
-            <motion.path d="M50 3 V59" stroke="#fff" strokeWidth=".1" strokeDasharray="1 1.2" style={{ pathLength: axes, opacity: axesO }} fill="none" />
-            <motion.circle cx={CX} cy={CY} r=".8" fill="#fff" style={{ opacity: dotO }} className="pulse" />
+          <svg aria-hidden viewBox={`0 0 100 ${G.H}`} className="absolute inset-0 h-full w-full overflow-visible">
+            <motion.path d={`M6 ${cyv()} H94`} stroke="#fff" strokeWidth=".1" strokeDasharray="1 1.2" style={{ pathLength: axes, opacity: axesO }} fill="none" />
+            <motion.path d={`M50 ${Y(3)} V${Y(59)}`} stroke="#fff" strokeWidth=".1" strokeDasharray="1 1.2" style={{ pathLength: axes, opacity: axesO }} fill="none" />
+            <motion.circle cx={CX} cy={cyv()} r={0.8 * k} fill="#fff" style={{ opacity: dotO }} className="pulse" />
             <Structure p={p} />
             <Mini p={p} />
           </svg>
 
-          <motion.div style={{ scale: coreS, opacity: coreO }} className="bp-core absolute left-1/2 top-1/2 z-20 grid h-[9cqw] w-[13cqw] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[1.4cqw] bg-purple text-white shadow-[0_0_0_.6cqw_rgb(109_63_192/.18)]">
-            <span className="text-center font-sans text-[2.2cqw] font-medium leading-none">GCC<span className="mt-[.5cqw] block text-[.85cqw] font-normal tracking-[.2em] text-white/70">CORE</span></span>
+          <motion.div style={{ scale: coreS, opacity: coreO, width: `${13 * k}cqw`, height: `${9 * k}cqw`, borderRadius: `${1.4 * k}cqw` }} className="bp-core absolute left-1/2 top-1/2 z-20 grid -translate-x-1/2 -translate-y-1/2 place-items-center bg-purple text-white shadow-[0_0_0_.6cqw_rgb(109_63_192/.18)]">
+            <span className="text-center font-sans font-medium leading-none" style={{ fontSize: `${2.2 * k}cqw` }}>GCC<span className="block font-normal tracking-[.2em] text-white/70" style={{ fontSize: `${0.85 * k}cqw`, marginTop: `${0.5 * k}cqw` }}>CORE</span></span>
           </motion.div>
 
           {mods.map((m) => <Module key={m.k} m={m} p={p} stage={stage} />)}
 
-          <motion.p style={{ opacity: final, y: finalY }} className="pointer-events-none absolute left-1/2 top-[60%] z-30 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/80 px-[2cqw] py-[.7cqw] font-sans text-[2.4cqw] text-white">One partner who owns it all.</motion.p>
+          <motion.p style={{ opacity: final, y: finalY, fontSize: `${2.4 * (k > 1 ? 1.7 : 1)}cqw` }} className="pointer-events-none absolute left-1/2 top-[60%] z-30 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink/80 px-[2cqw] py-[.7cqw] font-sans text-white">One partner who owns it all.</motion.p>
 
-          <motion.div style={{ opacity: ctaO, y: ctaY, pointerEvents: ctaLive }} className="absolute left-1/2 top-[56%] z-30 -translate-x-1/2 text-center">
-            <p className="font-sans text-[3cqw] font-normal leading-tight text-white">Ready to build?</p>
+          <motion.div style={{ opacity: ctaO, y: ctaY, pointerEvents: ctaLive }} className="absolute left-1/2 top-[56%] z-30 w-max -translate-x-1/2 text-center">
+            <p className="font-sans font-normal leading-tight text-white" style={{ fontSize: `${3 * (k > 1 ? 1.8 : 1)}cqw` }}>Ready to build?</p>
             <div className="mt-[1.6cqw]"><Magnetic><Link to={cta.to} className="group inline-flex items-center gap-2 rounded-full bg-purple px-6 py-3.5 text-[15px] font-medium text-white">{cta.label} <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span></Link></Magnetic></div>
           </motion.div>
         </motion.div>

@@ -55,7 +55,7 @@ export default function App() {
     ScrollTrigger.refresh()
     // ponytail: client-side titles only; add pre-rendering if per-page SEO snippets matter.
     const t = pages.find((p) => p.path === location.pathname)?.title ?? guides.find((g) => location.pathname.endsWith(g.slug))?.title
-    document.title = t ? `${t} — Finism` : 'Finism — Build your Global Capability Centre. Right, first time.'
+    document.title = t ? `${t} — Finism` : 'Finism — Build your Global Capability Centre. Right, the first time.'
   }, [location.pathname])
 
   return (

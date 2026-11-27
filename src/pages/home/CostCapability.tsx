@@ -30,7 +30,7 @@ export default function CostCapability() {
     )
   }
   return (
-    <div ref={root} style={{ height: '260vh' }}>
+    <div ref={root} className="h-[190vh] md:h-[260vh]">
       <motion.div style={{ backgroundColor: bg }} className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden px-6 text-center">
         <motion.p style={{ opacity: clauseO }} className="absolute top-[22%] font-sans text-lg text-muted md:text-2xl">Cost is no longer the pitch.</motion.p>
         <motion.h2 style={{ scale: costS, y: costY, opacity: costO }} className="absolute font-sans text-[clamp(5rem,22vw,17rem)] font-medium uppercase leading-none tracking-tight text-deep">Cost</motion.h2>

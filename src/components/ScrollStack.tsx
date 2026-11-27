@@ -5,9 +5,10 @@ import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTran
 // position `pos` (0 = active, <0 = waiting behind, >0 = left behind above) and everything is interpolated from it.
 // Motion values only, so nothing re-renders while scrolling.
 
-type Mode = 'full' | 'soft' | 'list' // desktop / tablet (gentler) / phone or reduced motion (plain list)
+type Mode = 'full' | 'soft' | 'phone' | 'list' // desktop / tablet (gentler) / phone (same scroll story, compact) / reduced motion (plain list)
 export type Variant = 'spin' | 'stack'
-type Ctx = { progress: MotionValue<number>; n: number; mode: Mode; variant: Variant }
+export type Align = 'center' | 'left' | 'bottom'
+type Ctx = { progress: MotionValue<number>; n: number; mode: Mode; variant: Variant; align: Align }
 const Stack = createContext<Ctx>(null!)
 const CardPos = createContext<MotionValue<number>>(null!)
 
@@ -16,33 +17,45 @@ function useMode(): Mode {
   const [mode, setMode] = useState<Mode>('full')
   useEffect(() => {
     const md = matchMedia('(min-width: 768px)'), lg = matchMedia('(min-width: 1024px)')
-    const sync = () => setMode(!md.matches ? 'list' : lg.matches ? 'full' : 'soft') // only on breakpoint change, never on scroll
+    const sync = () => setMode(!md.matches ? 'phone' : lg.matches ? 'full' : 'soft') // only on breakpoint change, never on scroll
     sync(); md.addEventListener('change', sync); lg.addEventListener('change', sync)
     return () => { md.removeEventListener('change', sync); lg.removeEventListener('change', sync) }
   }, [])
   return reduce ? 'list' : mode
 }
 
-export function ScrollCardSection({ children, labels, className = '', variant = 'spin', step = 90 }: { children: ReactNode; labels: string[]; className?: string; variant?: Variant; step?: number }) {
+// tail: extra scroll (vh) after the last card, used for a finale; backdrop: a scene drawn behind the cards on desktop, given the
+// (re-timed) card progress and the whole-section progress; timing re-maps scroll so hand-overs can happen where the scene needs them.
+export function ScrollCardSection({ children, labels, className = '', variant = 'spin', step = 90, align = 'center', tail = 0, timing, backdrop }: {
+  children: ReactNode; labels: string[]; className?: string; variant?: Variant; step?: number; align?: Align; tail?: number
+  timing?: [number[], number[]]; backdrop?: (cardP: MotionValue<number>, full: MotionValue<number>, mode: Mode) => ReactNode
+}) {
   const n = Children.count(children)
   const mode = useMode()
   const root = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: root, offset: ['start start', 'end end'] })
+  const tailVh = mode === 'full' || mode === 'phone' ? tail : 0
+  const cardsFrac = ((n - 1) * step) / ((n - 1) * step + tailVh) // share of the track used by the cards; the rest is the finale
+  const c = useTransform(scrollYProgress, (v) => Math.min(1, v / cardsFrac))
+  const cardP = useTransform(c, timing ? timing[0] : [0, 1], timing ? timing[1] : [0, 1])
+  const cardsOpacity = useTransform(scrollYProgress, [cardsFrac + (1 - cardsFrac) * 0.3, cardsFrac + (1 - cardsFrac) * 0.55], [1, 0]) // cards leave during the finale
+  const cardsEvents = useTransform(cardsOpacity, (o) => (o < 0.05 ? 'none' : 'auto'))
 
   if (mode === 'list') {
     return (
-      <Stack.Provider value={{ progress: scrollYProgress, n, mode, variant }}>
+      <Stack.Provider value={{ progress: cardP, n, mode, variant, align }}>
         <div className={`mx-auto grid max-w-3xl gap-5 ${className}`}>{children}</div>
       </Stack.Provider>
     )
   }
   return (
-    <Stack.Provider value={{ progress: scrollYProgress, n, mode, variant }}>
+    <Stack.Provider value={{ progress: cardP, n, mode, variant, align }}>
       {/* tall track drives the animation; the sticky child keeps the stack on screen */}
-      <div ref={root} style={{ height: `${(n - 1) * step + 100}vh` }} className={className}>
+      <div ref={root} style={{ height: `${(n - 1) * step + tailVh + 100}vh` }} className={className}>
         <div className="sticky top-0 grid h-[100svh] place-items-center overflow-hidden">
-          <div className="relative h-full w-full">{children}</div>
-          <Dots labels={labels} />
+          {(mode === 'full' || mode === 'phone') && backdrop && <div className="absolute inset-0">{backdrop(cardP, scrollYProgress, mode)}</div>}
+          <motion.div style={tailVh ? { opacity: cardsOpacity, pointerEvents: cardsEvents } : undefined} className="relative h-full w-full">{children}</motion.div>
+          {mode !== 'phone' && <Dots labels={labels} />}
         </div>
       </div>
     </Stack.Provider>
@@ -84,13 +97,13 @@ function LayerMotion({ depth, className, children }: { depth: number; className:
 }
 
 export function ScrollCard({ index, children, className = '' }: { index: number; children: ReactNode; className?: string }) {
-  const { progress, n, mode, variant } = useContext(Stack)
+  const { progress, n, mode, variant, align } = useContext(Stack)
   const shell = 'rounded-[2rem] border border-hairline bg-white shadow-[0_40px_80px_-44px_rgba(36,22,64,.4)]'
   if (mode === 'list') return <article className={`${shell} ${className}`}>{children}</article>
-  return <FullCard index={index} progress={progress} n={n} soft={mode === 'soft'} variant={variant} className={shell} inner={className}>{children}</FullCard>
+  return <FullCard index={index} progress={progress} n={n} soft={mode !== 'full'} variant={variant} align={mode === 'phone' && align === 'left' ? 'bottom' : align} className={shell} inner={className}>{children}</FullCard>
 }
 
-function FullCard({ index, progress, n, soft, variant, className, inner, children }: { variant: Variant; inner: string; index: number; progress: MotionValue<number>; n: number; soft: boolean; className: string; children: ReactNode }) {
+function FullCard({ index, progress, n, soft, variant, align, className, inner, children }: { align: Align; variant: Variant; inner: string; index: number; progress: MotionValue<number>; n: number; soft: boolean; className: string; children: ReactNode }) {
   // spin: the cards sit on an imaginary drum; the front one tips away (blurring out) as the next tips in from below.
   // stack: a physical pile; cards behind are smaller, lower and veiled, the front one is sharp and dominant.
   const spin = variant === 'spin'
@@ -115,8 +128,8 @@ function FullCard({ index, progress, n, soft, variant, className, inner, childre
   const bgY = useSpring(useTransform(my, [-0.5, 0.5], [3, -3]), sp)
 
   return (
-    <motion.div style={{ zIndex: z }} className="pointer-events-none absolute inset-0 grid place-items-center px-6">
-      <motion.div style={{ y, scale, opacity, filter, rotateX, transformPerspective: 1400 }} className="pointer-events-auto w-[min(92vw,58rem)] will-change-transform">
+    <motion.div style={{ zIndex: z }} className={`pointer-events-none absolute inset-0 grid grid-cols-[minmax(0,1fr)] ${align === 'left' ? 'content-center justify-items-start pl-[max(1.5rem,5vw)]' : align === 'bottom' ? 'content-end justify-items-center px-3 pb-6' : 'place-items-center px-4 md:px-6'}`}>
+      <motion.div style={{ y, scale, opacity, filter, rotateX, transformPerspective: 1400 }} className={`pointer-events-auto will-change-transform ${align === 'left' ? 'w-[min(44vw,34rem)]' : align === 'bottom' ? 'w-[min(94vw,34rem)]' : 'w-[min(94vw,58rem)]'}`}>
         <motion.div
           style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1200 }}
           onPointerMove={(e) => {
@@ -151,3 +164,7 @@ function ParallaxMotion({ className, amount, children }: { className: string; am
   const y = useTransform(pos, [-1, 0, 1], [amount, 0, -amount])
   return <div className={`overflow-hidden ${className}`}><motion.div style={{ y, scale: 1.18 }} className="h-full w-full">{children}</motion.div></div>
 }
+
+// The card's own position (0 = in front) for blocks that react to it; null in the plain list.
+export function useCardPos() { return useContext(CardPos) as MotionValue<number> | null }
+export function useStackMode() { return useContext(Stack).mode }

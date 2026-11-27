@@ -17,7 +17,7 @@ const Tag = ({ children, className = '' }: { children: ReactNode; className?: st
 // A photo, graded toward the brand purple, with thin data lines and labels laid over it.
 function PhotoVisual({ kind, photo }: { kind: Kind; photo: 'workspace' | 'servers' | 'operations' }) {
   return (
-    <div className="relative h-64 overflow-hidden rounded-[1.4rem] md:h-full md:min-h-[21rem]">
+    <div className="relative h-48 overflow-hidden rounded-[1.4rem] md:h-full md:min-h-[21rem]">
       <ParallaxLayer className="absolute inset-0"><Photo photo={photo} sizes="(min-width:768px) 32rem, 90vw" className="saturate-[.85]" /></ParallaxLayer>
       <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-deep/25 to-transparent" />
       <div className="absolute inset-0 bg-purple/15 mix-blend-multiply" />
@@ -30,7 +30,7 @@ function PhotoVisual({ kind, photo }: { kind: Kind; photo: 'workspace' | 'server
   )
 }
 
-const frame = 'relative h-64 overflow-hidden rounded-[1.4rem] bg-ink md:h-full md:min-h-[21rem]'
+const frame = 'relative h-48 overflow-hidden rounded-[1.4rem] bg-ink md:h-full md:min-h-[21rem]'
 const grid = <div aria-hidden className="absolute inset-0 opacity-40" style={{ backgroundImage: 'linear-gradient(rgb(255 255 255 / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .06) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
 function TalentVisual() {

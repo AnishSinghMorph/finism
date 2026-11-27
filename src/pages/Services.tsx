@@ -28,7 +28,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section className="px-6 pt-28">
+      <section className="hidden px-6 pt-28 md:block">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="eyebrow">Six capabilities</p>

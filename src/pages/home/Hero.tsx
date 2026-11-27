@@ -53,10 +53,10 @@ export default function Hero() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_0.95fr]">
         <div>
           <p className="eyebrow hero-fade">Global Capability Centres</p>
-          <h1 className="mt-5 text-[clamp(2.4rem,5vw,4.1rem)] font-medium leading-[1.04]">
+          <h1 className="mt-5 text-[clamp(2.2rem,5vw,4.1rem)] font-medium leading-[1.04]">
             <span className="block overflow-hidden pb-1"><span className="hero-line block">Build your Global</span></span>
             <span className="block overflow-hidden pb-1"><span className="hero-line block">Capability Centre.</span></span>
-            <span className="block overflow-hidden pb-2"><span className="hero-line block"><em>Right, first time.</em></span></span>
+            <span className="block overflow-hidden pb-2"><span className="hero-line block"><em>Right, the first time.</em></span></span>
           </h1>
           <p className="hero-fade mt-7 max-w-xl text-lg leading-relaxed text-muted">
             A launch is a milestone. A centre that keeps delivering business value is the outcome. Finism designs it around your operating objectives and stays accountable from first decision to scale.

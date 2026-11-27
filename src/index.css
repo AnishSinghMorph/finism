@@ -61,3 +61,8 @@ html.lenis, html.lenis body { height: auto; }
 .bp[data-focus] .bp-core { box-shadow: 0 0 0 1.1cqw rgb(109 63 192 / .35); }
 .bp-panel { opacity: 0; transform: translateY(.6cqw); pointer-events: none; transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1); }
 .bp-mod[data-on] + .bp-panel { opacity: 1; transform: none; }
+
+/* GCC Maturity: restless while setting up, then calm. --amp is driven by scroll. */
+@keyframes mat-drift { 0%, 100% { translate: 0 0 } 50% { translate: calc(var(--amp, 0) * 0.6px) calc(var(--amp, 0) * -0.5px) } }
+.mat-drift { animation: mat-drift 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .mat-drift { animation: none; } }

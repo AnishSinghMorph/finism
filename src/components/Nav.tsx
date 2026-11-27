@@ -63,7 +63,7 @@ export default function Nav() {
         </ul>
         <div className="flex items-center gap-2">
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-            <Link to={cta.to} className="inline-flex items-center gap-2 rounded-full bg-purple px-5 py-2.5 text-sm font-medium text-white">
+            <Link to={cta.to} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-purple px-3.5 py-2 text-[13px] font-medium text-white sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm">
               {cta.label} <span aria-hidden>↗</span>
             </Link>
           </motion.div>
