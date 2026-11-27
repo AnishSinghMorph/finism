@@ -14,7 +14,7 @@ export const landing = { on: false }
 // uMorph blends one into the other as the sphere shrinks, so it reads as a single object changing size and character.
 const vert = `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`
 const frag = `
-varying vec2 vUv; uniform float uMorph; uniform float uPx;
+varying vec2 vUv; uniform float uMorph; uniform float uPx; uniform float uShine;
 void main() {
   vec2 p = (vUv - 0.5) * 2.0 * 1.35;
   float d = length(p);
@@ -22,10 +22,21 @@ void main() {
   float t = length(p - vec2(0.0, 0.6128)) / 1.6128;
   vec3 hero = t < 0.7812 ? vec3(0.0) : t < 0.9202 ? mix(vec3(0.0), mid, (t - 0.7812) / 0.1390) : mix(mid, top, clamp((t - 0.9202) / 0.0798, 0.0, 1.0));
   vec3 circ = mix(mid, top, clamp((1.0 - p.y) * 0.5, 0.0, 1.0));
+  // once it is a small ball it turns into a glossy 3D sphere: lit from the upper left, with a soft specular highlight and rim light
+  vec3 n = normalize(vec3(p.x, p.y, sqrt(max(0.0, 1.0 - d * d))));
+  vec3 L = normalize(vec3(-0.5, 0.62, 0.6));
+  float diff = clamp(dot(n, L), 0.0, 1.0);
+  vec3 shaded = mix(mid * 0.7, top * 1.12, smoothstep(0.0, 0.95, diff));
+  float rim = pow(1.0 - n.z, 3.0);
+  shaded += rim * 0.3 * vec3(0.66, 0.55, 0.95);
+  circ = mix(circ, shaded, uShine);
   vec3 body = mix(hero, circ, uMorph);
   float aa = 1.5 / max(uPx, 1.0);
   float disc = 1.0 - smoothstep(1.0 - aa, 1.0 + aa, d);
   float halo = (1.0 - smoothstep(0.80, 1.22, d)) * (1.0 - uMorph);
+  float spec = pow(clamp(dot(normalize(L + vec3(0.0, 0.0, 1.0)), n), 0.0, 1.0), 42.0);
+  float glint = smoothstep(0.1, 0.0, length(p - vec2(-0.36, 0.42)) - 0.07);
+  body += uShine * (spec * 0.75 + glint * 0.55) * vec3(1.0, 0.97, 1.0);
   vec3 col = mix(vec3(0.3569, 0.2196, 0.6), body, disc);
   gl_FragColor = vec4(col, max(disc, halo * 0.92));
 }`
@@ -73,12 +84,13 @@ export default function LandingOrb() {
     m.scale.set(r * 1.35, r * 1.35, 1)
     sm.uniforms.uMorph.value = Math.max(smooth(clamp((e - 0.04) / 0.8)), e2)
     sm.uniforms.uPx.value = r
+    sm.uniforms.uShine.value = e2
   })
 
   return (
     <mesh ref={mesh} visible={false}>
       <planeGeometry args={[2, 2]} />
-      <shaderMaterial ref={mat} vertexShader={vert} fragmentShader={frag} transparent depthTest={false} uniforms={{ uMorph: { value: 0 }, uPx: { value: 100 } }} />
+      <shaderMaterial ref={mat} vertexShader={vert} fragmentShader={frag} transparent depthTest={false} uniforms={{ uMorph: { value: 0 }, uPx: { value: 100 }, uShine: { value: 0 } }} />
     </mesh>
   )
 }

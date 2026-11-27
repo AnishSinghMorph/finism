@@ -140,7 +140,7 @@ export default function Mobile() {
         </div>
         <div className="relative ml-auto mt-16 w-[66%] max-w-[300px]">
           <img alt="Finism" src={IMG.logoBig} className="w-full" />
-          <div id="dot-end" aria-hidden className="pointer-events-none absolute" style={{ left: 0, top: '74%', width: '6.84%', aspectRatio: '1' }} />
+          <div id="dot-end" aria-hidden className="pointer-events-none absolute rounded-full" style={{ left: 0, top: '74%', width: '6.84%', aspectRatio: '1', background: rich ? undefined : 'linear-gradient(135deg,#3b1f70,#6d3fc0 70%,#a98ddd)' }} />
         </div>
         <nav className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/15 pt-6">
           {[['Solutions', '/solutions/services'], ['Why GCC', '/why-gcc'], ['Why Finism', '/why-finism'], ['Insights', '/insights']].map(([l, to]) => <Link key={l} to={to} className="font-body text-[13px] font-medium text-[#f9f8f5]">{l}</Link>)}

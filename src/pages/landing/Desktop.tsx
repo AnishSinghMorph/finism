@@ -203,7 +203,7 @@ export default function Desktop() {
 
       {/* footer */}
       <A x={1337} y={5824} w={383} h={107}><img alt="Finism" src={IMG.logoBig} className="h-full w-full max-w-none" /></A>
-      <div id="dot-end" aria-hidden className="pointer-events-none absolute" style={{ left: u(1337), top: u(5824 + 79.2), width: u(26.2), height: u(26.4) }} />
+      <div id="dot-end" aria-hidden className="pointer-events-none absolute rounded-full" style={{ left: u(1337), top: u(5824 + 79.2), width: u(26.2), height: u(26.4), background: rich ? undefined : 'linear-gradient(135deg,#3b1f70,#6d3fc0 70%,#a98ddd)' }} />
       <A z={false} x={0} y={6120} w={1921} h={1}><img alt="" src={IMG.divider} className="w-full max-w-none" /></A>
       {[['Solutions', 1189, '/solutions/services'], ['Why GCC', 1273, '/why-gcc'], ['Why Finism', 1359, '/why-finism'], ['Insights', 1455, '/insights']].map(([l, x, to]) => (
         <A key={l as string} x={x as number} y={6026}><Link to={to as string} className="font-body font-medium text-[#f9f8f5] hover:text-white" style={{ fontSize: fs(12, 11) }}>{l}</Link></A>
