@@ -48,6 +48,7 @@ export default function LandingOrb() {
   useFrame(({ size }) => {
     const m = mesh.current, sm = mat.current
     if (!m || !sm) return
+    if (document.getElementById('journey-root')) { m.visible = false; return } // the desktop journey has its own orbs
     const H = document.getElementById('orb-hero')?.getBoundingClientRect()
     const T = document.getElementById('orb-core')?.getBoundingClientRect()
     if (!H || !T) { landing.on = false; m.visible = false; return }

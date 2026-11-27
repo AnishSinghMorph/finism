@@ -1,5 +1,5 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
-import { motion } from 'motion/react'
+import { motion, type MotionStyle } from 'motion/react'
 
 // The desktop landing is laid out on the design's 1920-unit canvas: `--u` is the pixel size of one design unit
 // (set from the page width), so every position and size in the Figma translates one-to-one at any width.
@@ -20,10 +20,10 @@ export function useUnit(designWidth = 1920) {
   return ref
 }
 
-type Box = { x?: number; y?: number; w?: number; h?: number; z?: boolean; reveal?: boolean; delay?: number; id?: string; className?: string; style?: CSSProperties; children?: ReactNode }
+type Box = { x?: number; y?: number; w?: number; h?: number; z?: boolean; reveal?: boolean; delay?: number; id?: string; className?: string; style?: MotionStyle; children?: ReactNode }
 // Absolutely positioned box in design units. z: sits above the 3D orb canvas (text, cards, logos).
 export function A({ x = 0, y = 0, w, h, z = true, reveal = false, delay = 0, id, className = '', style, children }: Box) {
-  const st: CSSProperties = { left: u(x), top: u(y), width: w != null ? u(w) : undefined, height: h != null ? u(h) : undefined, ...style }
+  const st: MotionStyle = { left: u(x), top: u(y), width: w != null ? u(w) : undefined, height: h != null ? u(h) : undefined, ...style }
   return (
     <motion.div
       id={id} className={`absolute ${z ? 'z-[45]' : ''} ${className}`} style={st}
@@ -33,7 +33,7 @@ export function A({ x = 0, y = 0, w, h, z = true, reveal = false, delay = 0, id,
   )
 }
 // Same, for children of an already-positioned box (relative coordinates).
-export function R({ x = 0, y = 0, w, h, className = '', style, children }: Omit<Box, 'z' | 'reveal' | 'delay' | 'id'>) {
+export function R({ x = 0, y = 0, w, h, className = '', style, children }: Omit<Box, 'z' | 'reveal' | 'delay' | 'id' | 'style'> & { style?: CSSProperties }) {
   return <div className={`absolute ${className}`} style={{ left: u(x), top: u(y), width: w != null ? u(w) : undefined, height: h != null ? u(h) : undefined, ...style }}>{children}</div>
 }
 

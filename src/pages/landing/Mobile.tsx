@@ -27,26 +27,26 @@ export default function Mobile() {
           {!rich && <img alt="" src={IMG.heroSphere} className="h-full w-full" />}
         </div>
         <h1 className="sr-only">Build your GCC. Right, first time.</h1>
-        <img alt="" src={IMG.headline} className="relative z-[45] mx-auto w-[84%] max-w-md" />
-        <p className="relative z-[45] mx-auto mt-6 max-w-md font-body text-[17px] leading-snug text-white">Finism builds and scales GCCs around your operating objectives—and stays accountable for long-term value.</p>
-        <div className="relative z-[45] mt-7"><Pill to="/plan-your-gcc/readiness-check" label="Plan a new GCC" fill="bg-white" color="#3b1f70" arrow={IMG.arrowInk} /></div>
-        <div className="relative z-[45] mx-auto mt-12 flex max-w-sm flex-wrap justify-center gap-3">
+        <img alt="" src={IMG.headline} className="relative z-[47] mx-auto w-[84%] max-w-md" />
+        <p className="relative z-[47] mx-auto mt-6 max-w-md font-body text-[17px] leading-snug text-white">Finism builds and scales GCCs around your operating objectives—and stays accountable for long-term value.</p>
+        <div className="relative z-[47] mt-7"><Pill to="/plan-your-gcc/readiness-check" label="Plan a new GCC" fill="bg-white" color="#3b1f70" arrow={IMG.arrowInk} /></div>
+        <div className="relative z-[47] mx-auto mt-12 flex max-w-sm flex-wrap justify-center gap-3">
           {[['Fragmented delivery', -4], ['Unclear accountability', 2], ['Difficulty scaling', -2]].map(([t, r]) => (
             <span key={t as string} style={{ rotate: `${r}deg` }} className={`${glass} inline-flex items-center gap-2.5 rounded-full px-5 py-3 font-body text-[15px] text-white`}><img alt="" src={IMG.chipDotB} className="h-2 w-2" />{t}</span>
           ))}
         </div>
-        <p className="relative z-[45] mx-auto mt-28 max-w-md font-body text-[15px] font-medium leading-snug text-muted">Challenges we solve: fragmented delivery, unclear accountability, difficulty scaling, and centres that are not delivering what was planned.</p>
+        <p className="relative z-[47] mx-auto mt-28 max-w-md font-body text-[15px] font-medium leading-snug text-muted">Challenges we solve: fragmented delivery, unclear accountability, difficulty scaling, and centres that are not delivering what was planned.</p>
       </section>
 
       {/* what makes Finism different */}
       <section className="relative bg-ink px-6 pb-16 pt-16 text-center" style={{ backgroundImage: 'linear-gradient(rgb(255 255 255 / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .06) 1px, transparent 1px)', backgroundSize: '36px 36px', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 }}>
-        <motion.h2 {...rise} className="relative z-[45] !font-sans text-[34px] font-medium !tracking-normal leading-[1.2]"><span className="!text-white">What makes </span><br /><span className="!text-purple">Finism different.</span></motion.h2>
+        <motion.h2 {...rise} className="relative z-[47] !font-sans text-[34px] font-medium !tracking-normal leading-[1.2]"><span className="!text-white">What makes </span><br /><span className="!text-purple">Finism different.</span></motion.h2>
         <div className="relative mx-auto mt-12 aspect-square w-[78%] max-w-[340px]">
-          <img alt="" src={IMG.ringDashed} className="absolute -inset-[24%] z-[45] h-[148%] w-[148%] max-w-none" />
+          <img alt="" src={IMG.ringDashed} className="absolute -inset-[24%] z-[47] h-[148%] w-[148%] max-w-none" />
           <div id="orb-core" aria-hidden className="pointer-events-none absolute inset-0">{!rich && <img alt="" src={IMG.circleCore} className="h-full w-full" />}</div>
-          <img alt="Finism" src={IMG.logoCore} className="absolute left-1/2 top-1/2 z-[45] w-[40%] -translate-x-1/2 -translate-y-1/2" />
+          <img alt="Finism" src={IMG.logoCore} className="absolute left-1/2 top-1/2 z-[47] w-[40%] -translate-x-1/2 -translate-y-1/2" />
         </div>
-        <div className="relative z-[45] mt-24 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
+        <div className="relative z-[47] mt-24 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
           {diffs.map((d, i) => (
             <motion.div key={d.t} {...rise} transition={{ duration: 0.7, delay: i * 0.06 }} className="rounded-[20px] bg-white p-5" style={{ boxShadow: FIG_SHADOW }}>
               <p className="font-sans text-base text-deep">{d.n}</p>

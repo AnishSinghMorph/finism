@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import LandingOrb, { landing } from './LandingOrb'
+import JourneyOrb from './JourneyOrb'
 import { EquirectangularReflectionMapping, MathUtils as M, SRGBColorSpace, TextureLoader, type DirectionalLight, type Mesh, type MeshPhysicalMaterial, type Texture } from 'three'
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v))
@@ -193,11 +194,12 @@ export default function Dot3D() {
       eventSource={document.body}
       eventPrefix="client"
       gl={{ alpha: true, antialias: true }}
-      style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 46, pointerEvents: 'none' }}
     >
       <Lights />
       <Orb />
       <LandingOrb />
+      <JourneyOrb />
       <Satellite phase={1.2} speed={0.55} rad={2.1} moon={0.17} delay={0} />
       <Satellite phase={3.9} speed={-0.38} rad={2.7} moon={0.1} delay={0.04} />
       <Satellite phase={5.6} speed={0.8} rad={1.75} moon={0.12} delay={0.08} />
